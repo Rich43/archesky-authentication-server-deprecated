@@ -21,7 +21,7 @@ from ..models import MyModel
 def usage(argv):
     cmd = os.path.basename(argv[0])
     print('usage: %s <config_uri> [var=value]\n'
-          '(example: "%s development.ini")' % (cmd, cmd))
+          '(example: "%s development_example.ini")' % (cmd, cmd))
     sys.exit(1)
 
 
