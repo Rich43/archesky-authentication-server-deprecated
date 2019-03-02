@@ -1,0 +1,3 @@
+[run]
+source = pyracms3_auth_server
+omit = pyracms3_auth_server/test*
