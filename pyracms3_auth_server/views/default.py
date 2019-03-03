@@ -8,9 +8,9 @@ from sqlalchemy.exc import DBAPIError
 
 from ..models import MyModel
 
-from oic.oic import Client, RegistrationResponse, AuthorizationResponse
+from oic.oic import Client, RegistrationResponse, AuthorizationResponse, ProviderConfigurationResponse
 from oic.utils.authn.client import CLIENT_AUTHN_METHOD
-from json import dumps
+from json import dumps, load
 
 
 @view_config(route_name='home', renderer='json')
@@ -36,21 +36,23 @@ def my_view(request: Request):
         one = query.filter(MyModel.name == 'one').first()
     except DBAPIError:
         return Response(db_err_msg, content_type='text/plain', status=500)
-
     return {'one': one, 'project': 'pyracms3_auth_server', 'provider_info': provider_info,
             'client_reg': client_reg, 'auth_req': auth_req, 'login_url': login_url}
 
 
 def create_client(request):
+    config_file = load(open(request.registry.settings['config.file']))
     client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
-    issuer = "https://login.microsoftonline.com/common/v2.0/"
-    provider_info = client.provider_config(issuer)
-    info = {"client_id": request.registry.settings['client.id'],
-            "client_secret": request.registry.settings['client.secret'],
-            "redirect_uris": ['http://localhost:6543/user_area'], "contacts": ["pynguins@outlook.com"]}
+    client.provider_info = ProviderConfigurationResponse(
+        version="1.0", issuer="https://accounts.google.com",
+        authorization_endpoint=config_file['web']['auth_uri'],
+        token_endpoint=config_file['web']['token_uri'])
+    info = {"client_id": config_file['web']['client_id'],
+            "client_secret": config_file['web']['client_secret'],
+            "redirect_uris": config_file['web']['redirect_uris'], "contacts": ["RichieS@GMail.com"]}
     client_reg = RegistrationResponse(**info)
     client.store_registration_info(client_reg)
-    return client, client_reg, provider_info
+    return client, client_reg, client.provider_info
 
 
 @view_config(route_name='login')
