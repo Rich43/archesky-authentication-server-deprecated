@@ -21,10 +21,10 @@ def my_view(request: Request):
     args = {
         "client_id": client.client_id,
         "response_type": "code",
-        "scope": ["openid"],
+        "scope": ["openid email"],
         "nonce": request.session["nonce"],
         "redirect_uri": client.registration_response["redirect_uris"][0],
-        "state": request.session["state"]
+        "state": request.session["state"],
     }
 
     auth_req = client.construct_AuthorizationRequest(request_args=args)
@@ -37,19 +37,20 @@ def my_view(request: Request):
     except DBAPIError:
         return Response(db_err_msg, content_type='text/plain', status=500)
     return {'one': one, 'project': 'pyracms3_auth_server', 'provider_info': provider_info,
-            'client_reg': client_reg, 'auth_req': auth_req, 'login_url': login_url}
+            'client_reg': client_reg, 'auth_req': auth_req, 'login_url': login_url,
+            'token_endpoint': client.token_endpoint}
 
 
 def create_client(request):
     config_file = load(open(request.registry.settings['config.file']))
     client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
-    client.provider_info = ProviderConfigurationResponse(
-        version="1.0", issuer="https://accounts.google.com",
-        authorization_endpoint=config_file['web']['auth_uri'],
-        token_endpoint=config_file['web']['token_uri'])
-    info = {"client_id": config_file['web']['client_id'],
+    client.client_id = config_file['web']['client_id']
+    client.provider_config("https://accounts.google.com")
+
+    info = {"client_id": client.client_id,
             "client_secret": config_file['web']['client_secret'],
-            "redirect_uris": config_file['web']['redirect_uris'], "contacts": ["RichieS@GMail.com"]}
+            "redirect_uris": config_file['web']['redirect_uris'],
+            "contacts": ["RichieS@GMail.com"]}
     client_reg = RegistrationResponse(**info)
     client.store_registration_info(client_reg)
     return client, client_reg, client.provider_info
@@ -72,12 +73,17 @@ def user_area_view(request: Request):
         assert a_resp["state"] == request.session["state"]
         args = {
             "code": a_resp["code"],
-            "redirect_uri": client.registration_response["redirect_uris"][0]
+            "redirect_uri": client.registration_response["redirect_uris"][0],
+            "token_endpoint": client.token_endpoint,
+            "response_type": "code",
+            "scope": "openid email",
+            "client_id": client.client_id
         }
 
         resp = client.do_access_token_request(state=a_resp["state"],
                                               request_args=args,
-                                              authn_method="client_secret_basic")
+                                              scope="openid email",
+                                              authn_method="client_secret_post")
 
         return {'GET': response, 'a_resp': a_resp, 'resp': resp}
 
