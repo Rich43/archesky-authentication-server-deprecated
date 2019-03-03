@@ -70,7 +70,11 @@ def user_area_view(request: Request):
 
         a_resp = client.parse_response(AuthorizationResponse, info=response)
 
-        assert a_resp["state"] == request.session["state"]
+        try:
+            assert a_resp.get("state") == request.session.get("state")
+        except AssertionError:
+            return {"error": "state mismatch", "a_resp": a_resp, "session": request.session}
+
         args = {
             "code": a_resp["code"],
             "redirect_uri": client.registration_response["redirect_uris"][0],
@@ -85,7 +89,12 @@ def user_area_view(request: Request):
                                               scope="openid email",
                                               authn_method="client_secret_post")
 
-        return {'GET': response, 'a_resp': a_resp, 'resp': resp}
+        if resp.get("error"):
+            user_info = None
+        else:
+            user_info = client.do_user_info_request(state=a_resp["state"])
+
+        return {'GET': response, 'a_resp': a_resp, 'resp': resp, 'user_info': user_info}
 
     return {}
 
