@@ -47,9 +47,7 @@ def user_area_view(request: Request):
         try:
             assert parsed_response.get("state") == request.session.get("state")
         except AssertionError:
-            return {"error": "state mismatch",
-                    "parsed_response": parsed_response,
-                    "session": request.session}
+            return {"error": "state mismatch"}
 
         args = {
             "code": parsed_response["code"],
