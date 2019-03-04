@@ -72,7 +72,7 @@ def user_area_view(request: Request):
                 state=parsed_response["state"]
             )
 
-        return {'GET': request.GET, 'user_info': user_info}
+        return {'GET': dict(request.GET), 'user_info': user_info}
 
     return {"error": "missing query string parameters"}
 
