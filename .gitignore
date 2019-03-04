@@ -4,4 +4,3 @@ venv
 *.sqlite
 development.ini
 production.ini
-config_files
