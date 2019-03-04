@@ -29,6 +29,56 @@ def home(request: Request):
     return {'login_url': login_url}
 
 
+@view_config(route_name='login')
+def login_view(request: Request):
+    raise HTTPFound(request.session['login_url'])
+
+
+@view_config(route_name='user_area', renderer='json')
+def user_area_view(request: Request):
+    client, client_reg, provider_info = create_client(request)
+
+    if request.GET.get('state') and request.GET.get('code'):
+        query_string_json = dumps(dict(request.GET))
+
+        parsed_response = client.parse_response(AuthorizationResponse,
+                                                info=query_string_json)
+
+        try:
+            assert parsed_response.get("state") == request.session.get("state")
+        except AssertionError:
+            return {"error": "state mismatch",
+                    "parsed_response": parsed_response,
+                    "session": request.session}
+
+        args = {
+            "code": parsed_response["code"],
+            "redirect_uri": client.registration_response["redirect_uris"][0],
+            "token_endpoint": client.token_endpoint,
+            "response_type": "code",
+            "scope": "openid email",
+            "client_id": client.client_id
+        }
+
+        access_token_response = client.do_access_token_request(
+            state=parsed_response["state"],
+            request_args=args,
+            scope="openid email",
+            authn_method="client_secret_post"
+        )
+
+        if access_token_response.get("error"):
+            user_info = None
+        else:
+            user_info = client.do_user_info_request(
+                state=parsed_response["state"]
+            )
+
+        return {'GET': request.GET, 'user_info': user_info}
+
+    return {}
+
+
 def create_client(request):
     settings = request.registry.settings
     client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
@@ -42,49 +92,6 @@ def create_client(request):
     client_reg = RegistrationResponse(**info)
     client.store_registration_info(client_reg)
     return client, client_reg, client.provider_info
-
-
-@view_config(route_name='login')
-def login_view(request: Request):
-    raise HTTPFound(request.session['login_url'])
-
-
-@view_config(route_name='user_area', renderer='json')
-def user_area_view(request: Request):
-    client, client_reg, provider_info = create_client(request)
-
-    if request.GET.get('state') and request.GET.get('code'):
-        response = dumps(dict(request.GET))
-
-        a_resp = client.parse_response(AuthorizationResponse, info=response)
-
-        try:
-            assert a_resp.get("state") == request.session.get("state")
-        except AssertionError:
-            return {"error": "state mismatch", "a_resp": a_resp, "session": request.session}
-
-        args = {
-            "code": a_resp["code"],
-            "redirect_uri": client.registration_response["redirect_uris"][0],
-            "token_endpoint": client.token_endpoint,
-            "response_type": "code",
-            "scope": "openid email",
-            "client_id": client.client_id
-        }
-
-        resp = client.do_access_token_request(state=a_resp["state"],
-                                              request_args=args,
-                                              scope="openid email",
-                                              authn_method="client_secret_post")
-
-        if resp.get("error"):
-            user_info = None
-        else:
-            user_info = client.do_user_info_request(state=a_resp["state"])
-
-        return {'GET': response, 'a_resp': a_resp, 'resp': resp, 'user_info': user_info}
-
-    return {}
 
 
 db_err_msg = """\
