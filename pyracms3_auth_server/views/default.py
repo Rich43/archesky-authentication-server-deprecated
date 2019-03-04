@@ -83,8 +83,8 @@ def create_client(request):
     client.client_id = settings['client.id']
     client.provider_config(settings['provider.url'])
 
-    info = {"client_id": settings['client_id'],
-            "client_secret": settings['client_secret'],
+    info = {"client_id": settings['client.id'],
+            "client_secret": settings['client.secret'],
             "redirect_uris": [settings['redirect.url']],
             "contacts": [settings['contact.email']]}
     client_reg = RegistrationResponse(**info)
