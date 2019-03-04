@@ -1,20 +1,15 @@
+from json import dumps
+
 from oic import rndstr
+from oic.oic import Client, RegistrationResponse, AuthorizationResponse
+from oic.utils.authn.client import CLIENT_AUTHN_METHOD
 from pyramid.httpexceptions import HTTPFound
 from pyramid.request import Request
-from pyramid.response import Response
 from pyramid.view import view_config
-
-from sqlalchemy.exc import DBAPIError
-
-from ..models import MyModel
-
-from oic.oic import Client, RegistrationResponse, AuthorizationResponse, ProviderConfigurationResponse
-from oic.utils.authn.client import CLIENT_AUTHN_METHOD
-from json import dumps, load
 
 
 @view_config(route_name='home', renderer='json')
-def my_view(request: Request):
+def home(request: Request):
     client, client_reg, provider_info = create_client(request)
     request.session["state"] = rndstr()
     request.session["nonce"] = rndstr()
@@ -31,26 +26,19 @@ def my_view(request: Request):
     login_url = auth_req.request(client.authorization_endpoint)
     request.session['login_url'] = login_url
 
-    try:
-        query = request.dbsession.query(MyModel)
-        one = query.filter(MyModel.name == 'one').first()
-    except DBAPIError:
-        return Response(db_err_msg, content_type='text/plain', status=500)
-    return {'one': one, 'project': 'pyracms3_auth_server', 'provider_info': provider_info,
-            'client_reg': client_reg, 'auth_req': auth_req, 'login_url': login_url,
-            'token_endpoint': client.token_endpoint}
+    return {'login_url': login_url}
 
 
 def create_client(request):
-    config_file = load(open(request.registry.settings['config.file']))
+    settings = request.registry.settings
     client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
-    client.client_id = config_file['web']['client_id']
-    client.provider_config("https://accounts.google.com")
+    client.client_id = settings['client.id']
+    client.provider_config(settings['provider.url'])
 
-    info = {"client_id": client.client_id,
-            "client_secret": config_file['web']['client_secret'],
-            "redirect_uris": config_file['web']['redirect_uris'],
-            "contacts": ["RichieS@GMail.com"]}
+    info = {"client_id": settings['client_id'],
+            "client_secret": settings['client_secret'],
+            "redirect_uris": [settings['redirect.url']],
+            "contacts": [settings['contact.email']]}
     client_reg = RegistrationResponse(**info)
     client.store_registration_info(client_reg)
     return client, client_reg, client.provider_info
