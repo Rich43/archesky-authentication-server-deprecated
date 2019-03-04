@@ -74,7 +74,7 @@ def user_area_view(request: Request):
 
         return {'GET': request.GET, 'user_info': user_info}
 
-    return {}
+    return {"error": "missing query string parameters"}
 
 
 def create_client(request):
