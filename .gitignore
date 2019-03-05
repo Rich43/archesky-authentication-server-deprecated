@@ -4,3 +4,4 @@ venv
 *.sqlite
 development.ini
 production.ini
+__pycache__
