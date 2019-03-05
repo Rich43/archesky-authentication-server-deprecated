@@ -10,13 +10,8 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'pyramid',
-    'pyramid_jinja2',
     'pyramid_debugtoolbar',
-    'pyramid_tm',
     'oic',
-    'SQLAlchemy',
-    'transaction',
-    'zope.sqlalchemy',
     'waitress',
     ]
 
@@ -26,9 +21,9 @@ tests_require = [
     'pytest-cov',
     ]
 
-setup(name='pyracms3_auth_server',
-      version='0.0',
-      description='pyracms3_auth_server',
+setup(name='pyracms3_authentication_server',
+      version='0.5',
+      description='pyracms3_authentication_server',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
           "Programming Language :: Python",
@@ -49,8 +44,6 @@ setup(name='pyracms3_auth_server',
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
-      main = pyracms3_auth_server:main
-      [console_scripts]
-      initialize_pyracms3_auth_server_db = pyracms3_auth_server.scripts.initializedb:main
+      main = pyracms3_authentication_server:main
       """,
       )

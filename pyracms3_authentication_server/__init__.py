@@ -1,4 +1,3 @@
-import datetime
 import uuid
 
 from pyramid.config import Configurator
@@ -10,9 +9,6 @@ def custom_json_renderer():
     """
     Return a custom json renderer that can deal with some datetime objects.
     """
-    def datetime_adapter(obj, request):
-        return obj.isoformat()
-
     def object_adapter(obj, request):
         types = [str, int, bool, list, dict, type(None)]
         if hasattr(obj, "__dict__"):
@@ -23,7 +19,6 @@ def custom_json_renderer():
         return filtered
 
     json_renderer = JSON()
-    json_renderer.add_adapter(datetime.datetime, datetime_adapter)
     json_renderer.add_adapter(object, object_adapter)
     return json_renderer
 
@@ -34,8 +29,6 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.add_renderer('json', custom_json_renderer())
     config.set_session_factory(SignedCookieSessionFactory(str(uuid.uuid1())))
-    config.include('pyramid_jinja2')
-    config.include('.models')
     config.include('.routes')
     config.scan()
     return config.make_wsgi_app()

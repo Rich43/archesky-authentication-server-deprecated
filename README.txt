@@ -1,4 +1,4 @@
-pyracms3_auth_server README
+pyracms3_authentication_server README
 ==================
 
 Getting Started
@@ -8,7 +8,7 @@ Getting Started
 
 - $VENV/bin/pip install -e .
 
-- $VENV/bin/initialize_pyracms3_auth_server_db development.ini
+- $VENV/bin/initialize_pyracms3_authentication_server_db development.ini
 
 - $VENV/bin/pserve development.ini
 
