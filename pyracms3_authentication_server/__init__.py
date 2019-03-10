@@ -1,3 +1,5 @@
+from uuid import uuid1
+
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
 from pyramid_beaker import session_factory_from_settings
@@ -24,6 +26,8 @@ def custom_json_renderer():
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+    settings['session.key'] = str(uuid1())
+    settings['session.secret'] = str(uuid1())
     config = Configurator(settings=settings)
     config.add_renderer('json', custom_json_renderer())
     config.include('pyramid_beaker')
