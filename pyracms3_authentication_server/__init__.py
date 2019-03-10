@@ -1,8 +1,6 @@
-import uuid
-
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
-from pyramid.session import SignedCookieSessionFactory
+from pyramid_beaker import session_factory_from_settings
 
 
 def custom_json_renderer():
@@ -28,7 +26,9 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings)
     config.add_renderer('json', custom_json_renderer())
-    config.set_session_factory(SignedCookieSessionFactory(str(uuid.uuid1())))
+    config.include('pyramid_beaker')
     config.include('.routes')
+    session_factory = session_factory_from_settings(settings)
+    config.set_session_factory(session_factory)
     config.scan()
     return config.make_wsgi_app()
