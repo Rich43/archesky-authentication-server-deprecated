@@ -20,6 +20,7 @@ class OpenID(Config):
         self.config = config
         self.client: Client = None
         self.create_client()
+        self.register_client()
 
     @staticmethod
     def create_nonce_and_state():
@@ -38,7 +39,6 @@ class OpenID(Config):
                 "contacts": [self.config.contact_email]}
         client_reg = RegistrationResponse(**info)
         self.client.store_registration_info(client_reg)
-        return client_reg
 
     def do_authorisation_request(self, nonce: str, state: str):
         args = {
