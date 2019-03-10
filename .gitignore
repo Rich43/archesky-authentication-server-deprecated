@@ -5,3 +5,4 @@ venv
 development.ini
 production.ini
 __pycache__
+sessions
