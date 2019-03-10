@@ -2,7 +2,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.request import Request
 from pyramid.view import view_config
 
-from pyracms3_authentication_server.openid import Config, OpenID
+from .openid import Config, OpenID
 
 
 # noinspection PyUnresolvedReferences
