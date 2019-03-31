@@ -1,11 +1,5 @@
 import unittest
 
-from pyramid import testing
-
-
-def dummy_request(dbsession):
-    return testing.DummyRequest(dbsession=dbsession)
-
 
 class BaseTest(unittest.TestCase):
     def setUp(self):

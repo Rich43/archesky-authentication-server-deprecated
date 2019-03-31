@@ -1,0 +1,2 @@
+import archesky_authentication_server
+archesky_authentication_server.main(True)

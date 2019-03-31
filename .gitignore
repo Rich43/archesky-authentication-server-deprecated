@@ -2,7 +2,6 @@
 venv
 *.egg-info
 *.sqlite
-development.ini
-production.ini
+config.ini
 __pycache__
 sessions
