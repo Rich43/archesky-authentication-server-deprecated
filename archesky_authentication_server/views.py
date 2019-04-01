@@ -29,7 +29,7 @@ async def home(request: Request):
 
 
 async def login(request: Request):
-    raise RedirectResponse(request.session['login_url'])
+    return RedirectResponse(request.session['login_url'])
 
 
 async def user_area(request: Request):
