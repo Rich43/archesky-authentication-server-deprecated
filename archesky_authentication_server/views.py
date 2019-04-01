@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 
 from starlette.requests import Request
-from starlette.responses import JSONResponse, RedirectResponse
+from starlette.responses import JSONResponse, Response
 
 from .json_utils import json_response_object
 from .openid import Config, OpenID
@@ -29,7 +29,11 @@ async def home(request: Request):
 
 
 async def login(request: Request):
-    return RedirectResponse(request.session['login_url'])
+    if not request.session.get('login_url'):
+        return JSONResponse({'error': 'no login url in session',
+                             'error_code': 1})
+    return Response(status_code=302,
+                    headers={'location': request.session['login_url']})
 
 
 async def user_area(request: Request):
@@ -43,9 +47,10 @@ async def user_area(request: Request):
                 session.get('state')
             )
         except AssertionError:
-            return {'error': 'state mismatch'}
+            return {'error': 'state mismatch', 'error_code': 2}
         user_info = openid.get_user_info(code, session.get('state'))
         return json_response_object({'GET': dict(request.query_params),
                                      'user_info': user_info})
 
-    return JSONResponse({'error': 'missing query string parameters'})
+    return JSONResponse({'error': 'missing query string parameters',
+                         'error_code': 3})
