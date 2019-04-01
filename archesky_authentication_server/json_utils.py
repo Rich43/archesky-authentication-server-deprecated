@@ -1,6 +1,4 @@
-from json import JSONEncoder, dumps
-
-from starlette.responses import JSONResponse
+from json import JSONEncoder, dumps, loads
 
 
 class ObjectJSONEncoder(JSONEncoder):
@@ -18,5 +16,5 @@ def dump_object(obj):
     return dumps(obj, cls=ObjectJSONEncoder)
 
 
-def json_response_object(obj):
-    return JSONResponse(dump_object(obj))
+def dump_and_load_object(obj):
+    return loads(dump_object(obj))

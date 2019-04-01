@@ -3,7 +3,7 @@ from configparser import ConfigParser
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from .json_utils import json_response_object
+from .json_utils import dump_and_load_object
 from .openid import Config, OpenID
 
 
@@ -49,8 +49,8 @@ async def user_area(request: Request):
         except AssertionError:
             return JSONResponse({'error': 'state mismatch', 'error_code': 2})
         user_info = openid.get_user_info(code, session.get('state'))
-        return json_response_object({'GET': dict(request.query_params),
-                                     'user_info': user_info})
+        return JSONResponse({'GET': dict(request.query_params),
+                             'user_info': dump_and_load_object(user_info)})
 
     return JSONResponse({'error': 'missing query string parameters',
                          'error_code': 3})
