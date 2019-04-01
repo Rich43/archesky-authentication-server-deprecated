@@ -47,7 +47,7 @@ async def user_area(request: Request):
                 session.get('state')
             )
         except AssertionError:
-            return {'error': 'state mismatch', 'error_code': 2}
+            return JSONResponse({'error': 'state mismatch', 'error_code': 2})
         user_info = openid.get_user_info(code, session.get('state'))
         return json_response_object({'GET': dict(request.query_params),
                                      'user_info': user_info})
