@@ -1,5 +1,4 @@
 from logging import warning
-from os.path import exists
 from uuid import uuid1
 
 from starlette.applications import Starlette
@@ -7,9 +6,6 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from archesky_authentication_server.config import load_config
 from .views import home, login, user_area
-
-error = 'Missing config.ini, try renaming config_example.ini?'
-assert exists('config.ini'), error
 
 debug = load_config()['debug']
 if debug:
