@@ -3,9 +3,9 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.txt')) as f:
+with open(os.path.join(here, 'README.md')) as f:
     README = f.read()
-with open(os.path.join(here, 'CHANGES.txt')) as f:
+with open(os.path.join(here, 'CHANGES.md')) as f:
     CHANGES = f.read()
 
 requires = [
@@ -41,13 +41,5 @@ setup(name='archesky_authentication_server',
       extras_require={
           'testing': tests_require,
       },
-      install_requires=requires,
-      entry_points={
-          'console_scripts': [
-              'archesky_authentication_server='
-              'archesky_authentication_server:run_production',
-              'archesky_authentication_server_debug='
-              'archesky_authentication_server:run_debug'
-          ],
-      }
+      install_requires=requires
       )

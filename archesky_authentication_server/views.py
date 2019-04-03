@@ -1,16 +1,13 @@
-from configparser import ConfigParser
-
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
+from .config import load_config
 from .json_utils import dump_and_load_object
 from .openid import Config, OpenID
 
 
 def create_config():
-    config = ConfigParser()
-    config.read('config.ini')
-    settings = config['app:main']
+    settings = load_config()
     return Config(settings['contact.email'], settings['redirect.url'],
                   settings['provider.url'], settings['client.secret'],
                   settings['client.id'])
