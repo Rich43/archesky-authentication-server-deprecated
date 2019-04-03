@@ -41,5 +41,13 @@ setup(name='archesky_authentication_server',
       extras_require={
           'testing': tests_require,
       },
-      install_requires=requires
+      install_requires=requires,
+      entry_points={
+          'console_scripts': [
+              'archesky_authentication_server='
+              'archesky_authentication_server:run_production',
+              'archesky_authentication_server_debug='
+              'archesky_authentication_server:run_debug'
+          ],
+      }
       )
