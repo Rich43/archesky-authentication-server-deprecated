@@ -22,7 +22,7 @@ tests_require = [
 ]
 
 setup(name='archesky_authentication_server',
-      version='1.0',
+      version='1.1',
       description='archesky_authentication_server',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[

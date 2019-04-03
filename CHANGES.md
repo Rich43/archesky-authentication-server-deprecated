@@ -7,3 +7,8 @@
 ---
 
 - Converted to Starlette
+
+1.1
+---
+
+- Debug mode setting moved to config, now uses uvicorn to start
